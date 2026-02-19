@@ -10,14 +10,23 @@ export default function Login()
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         
         if (email.trim() === "" || password.trim() === "") {
             alert("Please enter email and password");
             return;
         }
-        console.log("Login: ", email, password);
+        const res = await fetch("http://localhost:8080/api/auth/login",{
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email,password})
+        });
+        const data = await res.json();
+
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("email", data.email);
+        localStorage.setItem("role", data.role);
         navigate("/dashboard");
     };
     return(
@@ -59,4 +68,4 @@ export default function Login()
             </Box>
         </Container>
     );
-}
+}                                                       

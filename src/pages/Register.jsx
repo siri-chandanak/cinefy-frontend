@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Container, Typography, Box, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
+import { TextField, Button, Container, Typography, Box, FormGroup, FormControlLabel, Checkbox, MenuItem } from "@mui/material";
 import { Link } from "react-router-dom";
 
 export default function Register()
@@ -11,10 +11,14 @@ export default function Register()
         email: "",
         password: "",
         age: "",
+        gender: "",
         country: "",
-        language: "",
+        city: "",
+        languagePref: "",
         genres: []
     });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const genresList = ["Action", "Comedy", "Drama", "Horror", "Sci-Fi", "Romance"];
     const handleChange = (e) => {
         setForm({
@@ -36,10 +40,45 @@ export default function Register()
             });
         }
     };
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
+        setError("");
+        setLoading(true);
+        try
+        {
+            const payload = {
+                name: form.name.trim(),
+                email: form.email.trim(),
+                password: form.password,
+                age: form.age ? Number(form.age) : null,
+                gender: form.gender || null,
+                country: form.country.trim() || null,
+                city: form.city.trim() || null,
+                languagePref: form.languagePref.trim() || null,
+                genres: form.genres
+            };
+            const res = await fetch("http://localhost:8080/api/auth/register", {
+                method: "POST",
+                headers: {"Content-Type":"application/json"},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json().catch(() => ({}));
+
+            if(!res.ok)
+            {
+                throw new Error(data.message || data.error || "Registration Failed");
+            }
+            navigate("/login");
+        }
+        catch(err)
+        {
+            setError(err.message || "Something went wrong");
+        }
+        finally
+        {
+            setLoading(false);
+        }
         console.log(form);
-        navigate("/dashboard");
     };
     return(
         <Container maxWidth = "sm">
@@ -86,6 +125,20 @@ export default function Register()
                         onChange={handleChange}
                     />
                     <TextField
+                        select
+                        fullWidth
+                        label="Gender"
+                        name="gender"
+                        margin="normal"
+                        value={form.gender}
+                        onChange={handleChange}
+                        >
+                        <MenuItem value="">Prefer not to say</MenuItem>
+                        <MenuItem value="MALE">Male</MenuItem>
+                        <MenuItem value="FEMALE">Female</MenuItem>
+                        <MenuItem value="OTHER">Other</MenuItem>
+                    </TextField>
+                    <TextField
                         fullWidth
                         label="Country"
                         name="country"
@@ -95,13 +148,21 @@ export default function Register()
                     />
                     <TextField
                         fullWidth
-                        label="Preferred Language"
-                        name="language"
+                        label="City"
+                        name="city"
                         margin="normal"
-                        value={form.language}
+                        value={form.city}
                         onChange={handleChange}
                     />
-                    <Typography variant="h6" mt={2}>
+                    <TextField
+                        fullWidth
+                        label="Language Preference"
+                        name="languagePref"
+                        margin="normal"
+                        value={form.languagePref}
+                        onChange={handleChange}
+                    />
+                    <Typography sx={{ mt: 2, mb: 1 }} fontWeight="bold">
                         Favorite Genres
                     </Typography>
                     <FormGroup row>
@@ -123,8 +184,9 @@ export default function Register()
                         variant="contained"
                         sx={{ mt:3 }}
                         type="submit"
+                        disabled={loading}
                     >
-                        Register
+                    {loading ? "Registering..." : "Register"}
                     </Button>
                 </form>
                 <Typography align="center" sx={{ mt: 2 }} >

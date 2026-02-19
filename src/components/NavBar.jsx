@@ -3,71 +3,115 @@ import "../styles/navbar.css";
 import { useState } from "react";
 import { AppBar, Toolbar, Typography, InputBase, Button, Box } from "@mui/material";
 
-function NavBar(){
-    const [search, setSearch]=useState("");
-    const navigate=useNavigate();
-    const handleSearch = () => {
-        const q = search.trim();
-        if (q) {
-          navigate(`/movies?search=${encodeURIComponent(q)}`);
-          setSearch("");
-        }
-    };
-    const handleKeyPress = (e) => {
-        if (e.key === "Enter") {
-            handleSearch();
-        }
-    };
-    return (
-        <AppBar position="static" sx={{ backgroundColor: "#111" }}>
-            <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-                {/* Logo */}
-                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                <Link to="/" className="navbar-logo" style={{ color: "#fff", textDecoration: "none" }}>
-                    🎞️ Cinefy
-                </Link>
-                </Typography>
+function NavBar() {
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
-                {/* Search */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <InputBase
-                    placeholder="Search movies..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown = {handleKeyPress}
-                    className="search-input"
-                    sx={{
-                    background: "#222",
-                    color: "#fff",
-                    px: 1.5,
-                    py: 0.5,
-                    borderRadius: 1,
-                    width: 260
-                    }}
-                />
-                </Box>
+  const isLoggedIn = !!localStorage.getItem("token");
 
-                {/* Links */}
-                <Box sx={{ display: "flex", gap: 3 }}>
-                <Link to="/movies" className="nav-link" style={{ color: "#ddd", textDecoration: "none" }}>
-                    Movies
-                </Link>
-                <Link to="/recommend" className="nav-link" style={{ color: "#ddd", textDecoration: "none" }}>
-                    Recommendations
-                </Link>
-                <Link to="/history" className="nav-link" style={{ color: "#ddd", textDecoration: "none" }}>
-                    History
-                </Link>
-                <Link to="/login" className="nav-link" style={{ color: "#ddd", textDecoration: "none" }}>
-                    Login
-                </Link>
-                <Link to="/register" className="nav-link" style={{ color: "#ddd", textDecoration: "none" }}>
-                    Register
-                </Link>
-                </Box>
-            </Toolbar>
-        </AppBar>
-    );
+  const handleSearch = () => {
+    const q = search.trim();
+    if (q) {
+      navigate(`/movies?search=${encodeURIComponent(q)}`);
+      setSearch("");
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+    window.location.reload(); // reset app state
+  };
+
+  return (
+    <AppBar position="static" sx={{ backgroundColor: "#111" }}>
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+
+        {/* LOGO */}
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          <Link
+            to={isLoggedIn ? "/dashboard" : "/"}
+            style={{ color: "#fff", textDecoration: "none" }}
+          >
+            🎞️ Cinefy
+          </Link>
+        </Typography>
+
+        {/* SEARCH — only after login */}
+        {isLoggedIn && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <InputBase
+              placeholder="Search movies..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={handleKeyPress}
+              sx={{
+                background: "#222",
+                color: "#fff",
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1,
+                width: 260
+              }}
+            />
+          </Box>
+        )}
+
+        {/* NAV LINKS */}
+        <Box sx={{ display: "flex", gap: 3 }}>
+
+          {/* AFTER LOGIN */}
+          {isLoggedIn && (
+            <>
+              <Link to="/dashboard" style={{ color: "#ddd", textDecoration: "none" }}>
+                Dashboard
+              </Link>
+
+              <Link to="/movies" style={{ color: "#ddd", textDecoration: "none" }}>
+                Movies
+              </Link>
+
+              <Link to="/recommend" style={{ color: "#ddd", textDecoration: "none" }}>
+                Recommendations
+              </Link>
+
+              <Link to="/history" style={{ color: "#ddd", textDecoration: "none" }}>
+                History
+              </Link>
+
+              <Link to="/profile" style={{ color: "#ddd", textDecoration: "none" }}>
+                Profile
+              </Link>
+
+              <Button color="inherit" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
+          )}
+
+          {/* BEFORE LOGIN */}
+          {!isLoggedIn && (
+            <>
+              <Link to="/login" style={{ color: "#ddd", textDecoration: "none" }}>
+                Login
+              </Link>
+
+              <Link to="/register" style={{ color: "#ddd", textDecoration: "none" }}>
+                Register
+              </Link>
+            </>
+          )}
+
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
 }
 
 export default NavBar;

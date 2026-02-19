@@ -7,7 +7,14 @@ export default function MovieCard({ movie }){
     return(
         <Card
             sx={{ width: 200, cursor: "pointer"}}
-            onClick={() => navigate("/movies/${movie.id}")}
+            onClick={() => {
+                const movieId = movie.id || movie.movieId;
+                if (!movieId) {
+                    console.error("Missing movie ID", movie);
+                    return;
+                }
+                navigate(`/movies/${movieId}`);
+                }}
         >
             <CardMedia
                 component="img"

@@ -1,23 +1,35 @@
 import MovieCard from "../components/MovieCard";
 import { Box, Typography, Grid } from "@mui/material";
+import { useEffect, useState } from "react";
+import { authFetch } from "../api/api";
+
 
 export default function Dashboard()
 {
-    const recommended = [
-        { id: 1, title: "Inception", poster: "https://via.placeholder.com/200x300" },
-        { id: 2, title: "Interstellar", poster: "https://via.placeholder.com/200x300" },
-        { id: 3, title: "Tenet", poster: "https://via.placeholder.com/200x300" }
-    ];
-    const trending = [
-        { id: 4, title: "Avengers", poster: "https://via.placeholder.com/200x300" },
-        { id: 5, title: "Batman", poster: "https://via.placeholder.com/200x300" },
-        { id: 6, title: "Joker", poster: "https://via.placeholder.com/200x300" }
-    ];
+    const [recommended, setRecommended] = useState([]);
+    const [trending, setTrending] = useState([]);
+    const [history, setHistory] = useState([]);
+    
+    useEffect(() => {
+        // Recommended
+        authFetch("http://localhost:8080/api/recommendations")
+        .then(res => res.json())
+        .then(data => setRecommended(data))
+        .catch(() => setRecommended([]));
 
-    const history = [
-        { id: 7, title: "Titanic", poster: "https://via.placeholder.com/200x300" },
-        { id: 8, title: "Gladiator", poster: "https://via.placeholder.com/200x300" }
-    ];
+        // Trending
+        authFetch("http://localhost:8080/api/movies/trending")
+        .then(res => res.json())
+        .then(data => setTrending(data))
+        .catch(() => setTrending([]));
+
+        // History
+        authFetch("http://localhost:8080/api/history")
+        .then(res => res.json())
+        .then(data => setHistory(data))
+        .catch(() => setHistory([]));
+    }, []);
+    
     return (
         <Box p={4}>
         <Typography variant="h4" gutterBottom>
@@ -29,11 +41,15 @@ export default function Dashboard()
             Recommended for You
         </Typography>
         <Grid container spacing={2}>
-            {recommended.map((movie) => (
-            <Grid item key={movie.id}>
+            {recommended.length === 0 ? (
+            <Typography>No recommendations yet</Typography>
+            ) : (
+            recommended.map((movie) => (
+                <Grid item key={movie.id}>
                 <MovieCard movie={movie} />
-            </Grid>
-            ))}
+                </Grid>
+            ))
+            )}
         </Grid>
 
         {/* Trending */}
@@ -41,11 +57,15 @@ export default function Dashboard()
             Trending Now
         </Typography>
         <Grid container spacing={2}>
-            {trending.map((movie) => (
-            <Grid item key={movie.id}>
+            {trending.length === 0 ? (
+            <Typography>No trending movies</Typography>
+            ) : (
+            trending.map((movie) => (
+                <Grid item key={movie.id}>
                 <MovieCard movie={movie} />
-            </Grid>
-            ))}
+                </Grid>
+            ))
+            )}
         </Grid>
 
         {/* History */}
@@ -53,11 +73,15 @@ export default function Dashboard()
             Recently Watched
         </Typography>
         <Grid container spacing={2}>
-            {history.map((movie) => (
-            <Grid item key={movie.id}>
+            {history.length === 0 ? (
+            <Typography>No watch history yet</Typography>
+            ) : (
+            history.map((movie) => (
+                <Grid item key={movie.id}>
                 <MovieCard movie={movie} />
-            </Grid>
-            ))}
+                </Grid>
+            ))
+            )}
         </Grid>
         </Box>
     );

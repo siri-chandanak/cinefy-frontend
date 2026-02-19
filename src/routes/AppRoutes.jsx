@@ -1,6 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+import ProtectedRoute from "../components/ProtectedRoute";
+import PublicRoute from "../components/PublicRoute";
+
 
 import Login from "../pages/login";
 import Register from "../pages/Register";
@@ -12,25 +16,111 @@ import MovieDetails from "../pages/MovieDetails";
 import Movies from "../pages/Movies";
 import Profile from "../pages/Profile";
 import Recommendations from "../pages/Recommendations";
+import AdminMovies from "../pages/AdminMovies";
+import AdminEditMovie from "../pages/AdminEditMovie";
 
-export default function AppRoutes()
-{
-    return(
+
+export default function AppRoutes() {
+    return (
         <BrowserRouter>
             <NavBar />
             <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="*" element={<Navigate to='/' replace />} />
-                <Route path="/dashboard" element={<Dashboard /> } />
-                <Route path="/movies" element={<Movies />} />
-                <Route path="/movies/:id" element={<MovieDetails />} />
-                <Route path="/recommend" element={<Recommendations />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/admin/add" element={<AdminAddMovie />} />
+                {/* PUBLIC ROUTES */}
+                <Route
+                    path="/"
+                    element={
+                        <PublicRoute>
+                            <Home />
+                        </PublicRoute>
+                    }
+                />
+
+                <Route
+                    path="/login"
+                    element={
+                        <PublicRoute>
+                            <Login />
+                        </PublicRoute>
+                    }
+                />
+
+                <Route
+                    path="/register"
+                    element={
+                        <PublicRoute>
+                            <Register />
+                        </PublicRoute>
+                    }
+                />
+
+                {/* PROTECTED ROUTES */}
+                <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/movies"
+                    element={
+                        <ProtectedRoute>
+                            <Movies />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/movies/:id"
+                    element={
+                        <ProtectedRoute>
+                            <MovieDetails />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/recommend"
+                    element={
+                        <ProtectedRoute>
+                            <Recommendations />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/history"
+                    element={
+                        <ProtectedRoute>
+                            <History />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route path="/admin" element={
+                        <ProtectedRoute role="ADMIN">
+                            <AdminAddMovie />
+                        </ProtectedRoute>
+                    }
+                />
+                
+
+
+                {/* FALLBACK */}
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            <Footer />.
         </BrowserRouter>
     );
 }

@@ -1,10 +1,25 @@
 import { Box, Typography, Grid, Card, CardMedia, CardContent } from "@mui/material";
-import { useHistory } from "../routes/HistoryContext";
+import { useEffect, useState } from "react";
+import { authFetch } from "../api/api";
+import MovieCard from "../components/MovieCard";
 
 
-export default function History()
-{
-    const { history } = useHistory();
+export default function History() {
+
+    const [history, setHistory] = useState([]);
+
+
+    useEffect(() => {
+        authFetch("http://localhost:8080/api/history")
+            .then(res => res.json())
+            .then(data => {
+                console.log("HISTORY DATA:", data);
+                setHistory(data);
+            })
+            .catch(err => console.error(err));
+    }, []);
+
+
     return (
         <Box p={4}>
             <Typography variant="h4" gutterBottom>
@@ -16,28 +31,18 @@ export default function History()
                     No watch history yet. Watch a movie to see it here 🎬
                 </Typography>
             ) : (
-                <Grid container spacing = {2}>
+                <Grid container spacing={2}>
                     {history.map((movie) => (
                         <Grid item key={movie.id}>
-                            <Card sx={{ width: 220 }}>
-                                <CardMedia
-                                    component="img"
-                                    height="300"
-                                    image={movie.poster}
-                                    alt={movie.title}
-                                />
-                                <CardContent>
-                                    <Typography variant="subtitle1">{movie.title}</Typography>
-                                    <Typography variant="body2" color="gray">
-                                        Watched: {new Date(movie.watchedAt).toLocaleString()}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                            <MovieCard movie={{
+                                id: movie.movieId,
+                                title: movie.title,
+                                posterUrl: movie.posterUrl
+                                }} />
                         </Grid>
                     ))}
                 </Grid>
             )}
-
         </Box>
     );
 }

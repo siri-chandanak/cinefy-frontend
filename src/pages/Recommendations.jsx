@@ -1,52 +1,81 @@
-import { Box, Typography, Grid } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Grid,
+  CircularProgress,
+  Box
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { authFetch } from "../api/api";
 import MovieCard from "../components/MovieCard";
-import { useHistory } from "../routes/HistoryContext";
 
 export default function Recommendations() {
-  const { history } = useHistory();
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // Dummy full movie catalog
-  const allMovies = [
-    { id: "1", title: "Inception", genre: "Sci-Fi", poster: "https://via.placeholder.com/200x300" },
-    { id: "2", title: "Interstellar", genre: "Sci-Fi", poster: "https://via.placeholder.com/200x300" },
-    { id: "3", title: "Tenet", genre: "Sci-Fi", poster: "https://via.placeholder.com/200x300" },
-    { id: "4", title: "Avengers", genre: "Action", poster: "https://via.placeholder.com/200x300" },
-    { id: "5", title: "Batman Begins", genre: "Action", poster: "https://via.placeholder.com/200x300" },
-    { id: "6", title: "Joker", genre: "Drama", poster: "https://via.placeholder.com/200x300" },
-    { id: "7", title: "Titanic", genre: "Romance", poster: "https://via.placeholder.com/200x300" }
-  ];
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      try {
+        const res = await authFetch(
+          "http://localhost:8080/api/recommendations?limit=20"
+        );
 
-  // Get genres from watch history
-  const watchedGenres = history.map((movie) => movie.genre);
+        if (res.status === 401 || res.status === 403) {
+          console.log("Session expired. Please login again.");
+          localStorage.removeItem("token");
+          navigate("/login", { replace: true });
+          return; // STOP execution
+        }
 
-  // Recommend movies with same genre
-  const recommendations = allMovies.filter(
-    (movie) =>
-      watchedGenres.includes(movie.genre) &&
-      !history.find((h) => h.id === movie.id)
-  );
+        if (!res.ok) {
+          throw new Error("Failed to load recommendations");
+        }
+
+        const data = await res.json();
+        setMovies(data || []);
+      } catch (err) {
+        console.error("Recommendation error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecommendations();
+  }, [navigate]);
+
+
+  if (loading) {
+    return (
+      <Box p={6} textAlign="center">
+        <CircularProgress />
+        <Typography mt={2}>Loading recommendations...</Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Box p={4}>
-      <Typography variant="h4" gutterBottom>
-        Recommended for You
+    <Container>
+      <Typography variant="h4" mt={4} mb={3}>
+        Recommended For You
       </Typography>
 
-      {history.length === 0 ? (
+      {movies.length === 0 ? (
         <Typography>
-          Watch some movies to get recommendations 🎬
+          No recommendations yet. Watch & like movies to get better suggestions 🎬
         </Typography>
-      ) : recommendations.length === 0 ? (
-        <Typography>No new recommendations yet.</Typography>
       ) : (
-        <Grid container spacing={2}>
-          {recommendations.map((movie) => (
-            <Grid item key={movie.id}>
-              <MovieCard movie={movie} />
+        <Grid container spacing={3}>
+          {movies.map((movie) => (
+            <Grid item xs={12} sm={6} md={3} key={movie.id}>
+              <div onClick={() => navigate(`/movies/${movie.id}`)} style={{ cursor: "pointer" }}>
+                <MovieCard movie={movie} />
+              </div>
             </Grid>
           ))}
         </Grid>
       )}
-    </Box>
+    </Container>
   );
 }
