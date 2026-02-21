@@ -269,6 +269,10 @@ Frontend UI Ranking
 
 ---
 
+Please refer "https://github.com/siri-chandanak/cinefy-App" for the full stack implementation.
+
+---
+
 # 📈 Future Roadmap
 
 - Dark / Light theme toggle
