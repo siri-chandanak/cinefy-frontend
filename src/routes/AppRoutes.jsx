@@ -16,8 +16,7 @@ import MovieDetails from "../pages/MovieDetails";
 import Movies from "../pages/Movies";
 import Profile from "../pages/Profile";
 import Recommendations from "../pages/Recommendations";
-import AdminMovies from "../pages/AdminMovies";
-import AdminEditMovie from "../pages/AdminEditMovie";
+import AdminManageMovies from "../pages/AdminManageMovies";
 
 
 export default function AppRoutes() {
@@ -108,12 +107,22 @@ export default function AppRoutes() {
                     }
                 />
 
-                <Route path="/admin" element={
+                <Route path="/admin/add" element={
                         <ProtectedRoute role="ADMIN">
                             <AdminAddMovie />
                         </ProtectedRoute>
                     }
                 />
+
+                <Route
+                    path="/admin/manage-movies"
+                    element={
+                        <ProtectedRoute role="ADMIN">
+                        <AdminManageMovies />
+                        </ProtectedRoute>
+                    }
+                />
+
                 
 
 

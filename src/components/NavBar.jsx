@@ -2,10 +2,13 @@ import { Link, useNavigate } from "react-router-dom";
 import "../styles/navbar.css";
 import { useState } from "react";
 import { AppBar, Toolbar, Typography, InputBase, Button, Box } from "@mui/material";
+import { getUserRole } from "../api/getUserRole";
+
 
 function NavBar() {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const role = getUserRole();
 
   const isLoggedIn = !!localStorage.getItem("token");
 
@@ -88,6 +91,26 @@ function NavBar() {
               <Link to="/profile" style={{ color: "#ddd", textDecoration: "none" }}>
                 Profile
               </Link>
+
+              {/* ADMIN ONLY */}
+                {role === "ADMIN" && (
+                <>
+                    <Link
+                    to="/admin/add"
+                    style={{ color: "#4caf50", textDecoration: "none", fontWeight: 600 }}
+                    >
+                    ➕ Add Movie
+                    </Link>
+
+                    <Link
+                    to="/admin/manage-movies"
+                    style={{ color: "#ff9800", textDecoration: "none", fontWeight: 600 }}
+                    >
+                    🛠 Manage Movies
+                    </Link>
+                </>
+                )}
+
 
               <Button color="inherit" onClick={handleLogout}>
                 Logout

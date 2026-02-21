@@ -165,7 +165,7 @@ export default function MovieDetails()
                 {/* Poster */}
                 <Grid>
                     <img
-                        src={movie.posterUrl}
+                        src={`http://localhost:8080${movie.posterUrl}`}
                         alt={movie.title}
                         style={{ width: 300, borderRadius: 8 }}
                     />

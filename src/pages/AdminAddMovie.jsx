@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   TextField,
@@ -12,6 +12,8 @@ import {
   OutlinedInput,
   Chip
 } from "@mui/material";
+import { authFetch } from "../api/api";
+
 
 export default function AdminAddMovie() {
 
@@ -24,15 +26,13 @@ export default function AdminAddMovie() {
     posterUrl: "",
     genres: []
   });
+  const [genresList, setGenresList] = useState([]);
 
-  const genresList = [
-    { id: 1, name: "Action" },
-    { id: 2, name: "Comedy" },
-    { id: 3, name: "Drama" },
-    { id: 4, name: "Horror" },
-    { id: 5, name: "Sci-Fi" },
-    { id: 6, name: "Romance" }
-  ];
+  useEffect(() => {
+    authFetch("http://localhost:8080/api/genres")
+      .then(res => res.json())
+      .then(data => setGenresList(data));
+  }, []);
 
   const handleChange = (e) => {
     setMovie({
@@ -60,23 +60,40 @@ export default function AdminAddMovie() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
-      title: movie.title,
-      description: movie.description,
-      language: movie.language,
-      releaseYear: Number(movie.releaseYear),
-      durationMin: Number(movie.durationMin),
-      posterUrl: movie.posterUrl,
-      genreIds: movie.genres
-    };
-    console.log("Sending:", payload);
+    if (!movie.posterFile) {
+      alert("Please select a poster image");
+      return;
+    }
 
-    // TODO: send to backend
-    // await authFetch("/api/admin/movies", {
-    //   method: "POST",
-    //   body: JSON.stringify(payload)
-    // });
-  };
+    const formData = new FormData();
+    formData.append("title", movie.title);
+    formData.append("description", movie.description);
+    formData.append("language", movie.language);
+    formData.append("releaseYear", movie.releaseYear);
+    formData.append("durationMin", movie.durationMin);
+    formData.append("poster", movie.posterFile);
+
+    // IMPORTANT: send genreIds like: genreIds=1&genreIds=2...
+    movie.genres.forEach((gid) => formData.append("genreIds", gid));
+
+    try {
+      const res = await authFetch("http://localhost:8080/api/admin/movies", {
+        method: "POST",
+        body: formData
+        // DO NOT set Content-Type manually for FormData
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      alert("Movie added ✅");
+      console.log(data);
+    } catch (err) {
+      console.error(err);
+      alert("Error adding movie");
+    }
+};
+
 
   return (
     <Container maxWidth="sm">

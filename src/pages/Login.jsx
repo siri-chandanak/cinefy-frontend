@@ -22,7 +22,16 @@ export default function Login()
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({email,password})
         });
+
+        if (!res.ok) {
+            const text = await res.text();
+            alert(text || "Login failed");
+        return;
+        }
+
         const data = await res.json();
+
+
 
         localStorage.setItem("token", data.token);
         localStorage.setItem("email", data.email);

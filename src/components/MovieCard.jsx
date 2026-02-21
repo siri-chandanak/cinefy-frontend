@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 
 export default function MovieCard({ movie }){
     const navigate = useNavigate();
+    const imageUrl = movie.posterUrl
+    ? `http://localhost:8080${movie.posterUrl}`
+    : "/placeholder.jpg";
 
     return(
         <Card
@@ -18,7 +21,7 @@ export default function MovieCard({ movie }){
         >
             <CardMedia
                 component="img"
-                image={movie.poster}
+                image={imageUrl}
                 alt={movie.title}
                 sx={{ height: 300 }}
             />

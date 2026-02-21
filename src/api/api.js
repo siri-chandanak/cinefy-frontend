@@ -1,30 +1,26 @@
 export const authFetch = async (url, options = {}) => {
-  const token = localStorage.getItem("token");
 
-  if (!token) {
-    console.error("❌ No token found. Please login.");
+  const isFormData = options.body instanceof FormData;
+
+  const headers = {
+    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+    ...(options.headers || {})
+  };
+
+  // Only set Content-Type if NOT FormData
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
   }
 
-  const res = await fetch(url, {
+  const response = await fetch(url, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-      ...(options.headers || {})
-    }
+    headers
   });
-  if (res.status === 401) {
-    console.log("Session expired");
 
+  if (response.status === 401) {
     localStorage.removeItem("token");
-
-    if (window.location.pathname !== "/login") {
-      window.location.href = "/login";
-    }
-
-    throw new Error("Unauthorized");
+    window.location.href = "/login";
   }
-  
 
-  return res;
+  return response;
 };
