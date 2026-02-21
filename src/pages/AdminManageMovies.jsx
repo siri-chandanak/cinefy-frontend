@@ -78,7 +78,6 @@ export default function AdminDeleteMovies() {
               <TableCell><b>Year</b></TableCell>
               <TableCell><b>Language</b></TableCell>
               <TableCell><b>Duration</b></TableCell>
-              <TableCell><b>Poster</b></TableCell>
               <TableCell><b>Actions</b></TableCell>
             </TableRow>
           </TableHead>
@@ -90,15 +89,7 @@ export default function AdminDeleteMovies() {
                 <TableCell>{movie.releaseYear}</TableCell>
                 <TableCell>{movie.language}</TableCell>
                 <TableCell>{movie.durationMin} min</TableCell>
-                <TableCell>
-                  {movie.posterUrl ? (
-                    <a href={movie.posterUrl} target="_blank" rel="noreferrer">
-                      View
-                    </a>
-                  ) : (
-                    "-"
-                  )}
-                </TableCell>
+                
                 <TableCell>
                   <Button
                     variant="contained"

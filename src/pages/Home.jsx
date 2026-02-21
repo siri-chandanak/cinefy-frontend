@@ -8,11 +8,16 @@ export default function Home() {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "#111",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
+    background: `
+      radial-gradient(circle at 50% 40%, rgba(128,0,255,0.2), transparent 50%),
+      radial-gradient(circle at 10% 80%, rgba(0,255,200,0.1), transparent 40%),
+      #0f0f0f
+    `,
+    color: "white",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center"
       }}
     >
       <Container maxWidth="md">

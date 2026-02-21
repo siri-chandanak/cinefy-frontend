@@ -25,11 +25,7 @@ export default function MovieCard({ movie }){
                 alt={movie.title}
                 sx={{ height: 300 }}
             />
-            <CardContent>
-                <Typography variant="subtitle1">
-                    {movie.title}
-                </Typography>
-            </CardContent>
+           
         </Card>
     );
 }
